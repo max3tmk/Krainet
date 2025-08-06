@@ -1,0 +1,33 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/krainet
+    username: krainet_user
+    password: secure_password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    table: flyway_schema_history_auth
+
+logging:
+  level:
+    root: INFO
+
+jwt:
+  secret: 1u3NqUzI4McvqjHgx2sCKphj1+U6HoXcq4ytpA0Qw4Q=
+
+notification-service:
+  url: http://notification-service:8090/api/internal/user-events

@@ -1,0 +1,75 @@
+services:
+  postgres-db:
+    image: postgres:15-alpine
+    container_name: krainet-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: krainet
+      POSTGRES_USER: krainet_user
+      POSTGRES_PASSWORD: secure_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - krainet_postgres_data:/var/lib/postgresql/data
+    networks:
+      - krainet-net
+
+  init-db:
+    image: postgres:15-alpine
+    container_name: krainet-init-db
+    depends_on:
+      - postgres-db
+    command: ["sh", "/init-db/reset-schema.sh"]
+    environment:
+      POSTGRES_DB: krainet
+      POSTGRES_USER: krainet_user
+      POSTGRES_PASSWORD: secure_password
+    volumes:
+      - ./init-db/reset-schema.sh:/init-db/reset-schema.sh:ro
+    networks:
+      - krainet-net
+    restart: "no"
+
+  auth-service:
+    build:
+      context: ./auth-service
+      dockerfile: Dockerfile
+    container_name: auth-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres-db
+      - init-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/krainet
+      SPRING_DATASOURCE_USERNAME: krainet_user
+      SPRING_DATASOURCE_PASSWORD: secure_password
+    volumes:
+      - ~/.m2:/root/.m2
+    networks:
+      - krainet-net
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8090:8090"
+    depends_on:
+      - postgres-db
+      - init-db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres-db:5432/krainet
+      SPRING_DATASOURCE_USERNAME: krainet_user
+      SPRING_DATASOURCE_PASSWORD: secure_password
+    volumes:
+      - ~/.m2:/root/.m2
+    networks:
+      - krainet-net
+
+volumes:
+  krainet_postgres_data:
+
+networks:
+  krainet-net:

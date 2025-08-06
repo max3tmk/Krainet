@@ -4,6 +4,6 @@ import lombok.*;
 
 @Getter
 @AllArgsConstructor
-public class AuthResponse {
+public class AuthenticationResponse {
     private final String jwt;
 }

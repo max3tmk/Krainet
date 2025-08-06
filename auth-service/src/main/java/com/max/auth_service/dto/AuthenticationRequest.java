@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuthRequest {
+public class AuthenticationRequest {
 
     @NotBlank(message = "Username must not be blank")
     private String username;

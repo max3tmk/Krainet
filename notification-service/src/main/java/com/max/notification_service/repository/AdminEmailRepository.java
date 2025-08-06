@@ -6,7 +6,7 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface EmailNotificationRepository extends CrudRepository<AdminUser, Long> {
+public interface AdminEmailRepository extends CrudRepository<AdminUser, Long> {
 
     @Query(value = "SELECT email FROM users WHERE role = 'ROLE_ADMIN'", nativeQuery = true)
     List<String> findAllAdminEmails();

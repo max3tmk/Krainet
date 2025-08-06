@@ -1,14 +1,16 @@
-package com.max.auth_service.service;
+package com.max.auth_service.security;
 
 import com.max.auth_service.dto.RegisterRequest;
 import com.max.auth_service.entity.User;
 import com.max.auth_service.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -16,32 +18,33 @@ public class UserSecurityService implements UserDetailsService {
 
     private final UserRepository userRepository;
 
-    // Загрузка пользователя по username для Spring Security
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
     }
 
-    // Проверка, существует ли пользователь с таким username
     public boolean userExists(String username) {
         return userRepository.existsByUsername(username);
     }
 
-    // Сохранение нового пользователя (например, при регистрации)
     public User save(User user, PasswordEncoder passwordEncoder) {
-        // Хешируем пароль перед сохранением
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        if (user.getPassword() == null || !user.getPassword().startsWith("$2")) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+        }
 
-        // Если роль не указана — ставим ROLE_USER по умолчанию
-        if (user.getRole() == null || user.getRole().isBlank()) {
+        if (!StringUtils.hasText(user.getRole())) {
             user.setRole("ROLE_USER");
         }
         return userRepository.save(user);
     }
 
-    // Регистрация пользователя из DTO запроса
-    public void register(RegisterRequest request, PasswordEncoder encoder) {
+    @Transactional
+    public User register(RegisterRequest request, PasswordEncoder encoder) {
+        if (!StringUtils.hasText(request.getUsername()) || !StringUtils.hasText(request.getPassword())) {
+            throw new IllegalArgumentException("Username and password must not be blank");
+        }
+
         String normalizedRole = normalizeRole(request.getRole());
 
         User user = new User();
@@ -52,12 +55,11 @@ public class UserSecurityService implements UserDetailsService {
         user.setLastName(request.getLastName());
         user.setRole(normalizedRole);
 
-        userRepository.save(user);
+        return userRepository.save(user);
     }
 
-    // Нормализация роли: если не начинается с "ROLE_", добавляем префикс и приводим к верхнему регистру
     private String normalizeRole(String input) {
-        if (input == null || input.isBlank()) {
+        if (!StringUtils.hasText(input)) {
             return "ROLE_USER";
         }
         return input.startsWith("ROLE_") ? input : "ROLE_" + input.toUpperCase();
