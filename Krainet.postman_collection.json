@@ -1,0 +1,131 @@
+{
+  "info": {
+    "_postman_id": "94c3ee7c-b58c-4f76-8c9e-8f5e3e25b556",
+    "name": "Krainet Auth Service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Register (USER only)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"user5\",\n  \"password\": \"password5\",\n  \"email\": \"user5@example.com\",\n  \"firstName\": \"User\",\n  \"lastName\": \"Five\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/register",
+          "host": ["{{base_url}}"],
+          "path": ["register"]
+        }
+      }
+    },
+    {
+      "name": "Authenticate",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"user5\",\n  \"password\": \"password5\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/authenticate",
+          "host": ["{{base_url}}"],
+          "path": ["authenticate"]
+        }
+      }
+    },
+    {
+      "name": "Get Current User",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/me",
+          "host": ["{{base_url}}"],
+          "path": ["users", "me"]
+        }
+      }
+    },
+    {
+      "name": "Get All Users (ADMIN)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users",
+          "host": ["{{base_url}}"],
+          "path": ["users"]
+        }
+      }
+    },
+    {
+      "name": "Get User by ID (ADMIN)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/1",
+          "host": ["{{base_url}}"],
+          "path": ["users", "1"]
+        }
+      }
+    },
+    {
+      "name": "Update User (ADMIN)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"user5\",\n  \"password\": \"password5\",\n  \"email\": \"updated5@example.com\",\n  \"firstName\": \"Updated\",\n  \"lastName\": \"User\",\n  \"role\": \"USER\"\n}"
+        },
+        "url": {
+          "raw": "{{base_url}}/users/5",
+          "host": ["{{base_url}}"],
+          "path": ["users", "5"]
+        }
+      }
+    },
+    {
+      "name": "Delete User (ADMIN)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": {
+          "raw": "{{base_url}}/users/5",
+          "host": ["{{base_url}}"],
+          "path": ["users", "5"]
+        }
+      }
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
